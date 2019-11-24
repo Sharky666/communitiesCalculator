@@ -3,7 +3,7 @@ import java.util.ArrayList;
 //TODO: Should the 'node' be a class? maybe it could be a HashMap?
 public class Node {
     private String name;
-    private ArrayList<String> connections = new ArrayList<>();
+    private ArrayList<Node> connections = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -13,11 +13,11 @@ public class Node {
         this.name = name;
     }
 
-    public ArrayList<String> getConnections() {
+    public ArrayList<Node> getConnections() {
         return connections;
     }
 
-    public void setConnections(ArrayList<String> connections) {
+    public void setConnections(ArrayList<Node> connections) {
         this.connections = connections;
     }
 }
