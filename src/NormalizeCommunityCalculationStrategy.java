@@ -7,13 +7,13 @@ public class NormalizeCommunityCalculationStrategy implements CommunityCalculati
         ArrayList<Node> unassignedNodes = new ArrayList<>(nodes);
         ArrayList<Node> loserNodes = new ArrayList<>(nodes);
         final Integer numOfRooms = (int) Math.ceil(nodes.size() / roomCapacity);
+        HashMap<ArrayList<Node>, ArrayList<Node>> satisfiedNodesPerRoom = new HashMap<>();
         //initializing the rooms.
         ArrayList<ArrayList<Node>> rooms = new ArrayList<ArrayList<Node>>();
         for (Integer i = 0; i < numOfRooms; i++) {
             rooms.add(new ArrayList<Node>());
         }
 
-        HashMap<ArrayList<Node>, ArrayList<Node>> satisfiedNodesPerRoom = new HashMap<>();
         rooms.forEach(room -> {
             satisfiedNodesPerRoom.put(room, new ArrayList<>());
             for (Integer i = 0; i < roomCapacity; i++) {
@@ -42,6 +42,35 @@ public class NormalizeCommunityCalculationStrategy implements CommunityCalculati
                             }
                         }
                     });
+                }
+            }
+        });
+        //TODO: figure out if it will actually work, might want to make it recursive.
+        loserNodes.forEach(loserNode -> {
+            for (Node wantedNode : loserNode.getConnections()) {
+                for (ArrayList<Node> room : rooms) {
+                    if (room.contains(wantedNode)) {
+                        // loop through the room that the wantedNode is at
+                        for (Node nodeInWantedRoom : room) {
+                            // if the room isn't full add the loserNode to it and return
+                            if (room.size() < roomCapacity) {
+                                room.add(loserNodes.remove(loserNodes.indexOf(loserNode)));
+                                return;
+                            //    for each node in the room that isn't the 'wantedNode' try and find a different room for it
+                            } else if (nodeInWantedRoom != wantedNode) {
+                                for (Node unwantedNodeConnectionNode : nodeInWantedRoom.getConnections()) {
+                                    for (ArrayList<Node> room1 : rooms) {
+                                        // if an available room is found, put the 'nodeInWantedRoom' in it and the loserNode instead of the 'nodeInWantedRoom', return.
+                                        if (room1.contains(unwantedNodeConnectionNode) && room1.size() < roomCapacity) {
+                                            room1.add(room.remove(room.indexOf(nodeInWantedRoom)));
+                                            room.add(loserNodes.remove(loserNodes.indexOf(loserNode)));
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         });
